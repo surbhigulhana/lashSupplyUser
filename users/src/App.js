@@ -27,6 +27,7 @@ import CompleteOrder from "./Component/AdminDashboard/CompleteOrder";
 import Webcam from "./Component/Webcam";
 import Webcam1 from "./Component/Webcam";
 import DummpyPrdo from "./Component/AdminDashboard/DummpyPrdo";
+import ChangePassword from "./Component/Changepwd";
 
 
 function App() {
@@ -34,6 +35,11 @@ function App() {
     <div>
       <Router>
         <Routes>
+     <Route
+            excat
+            path="/setpassword/:email"
+            element={<ChangePassword />}
+          ></Route>
           <Route exact path="/" element={<AdminLogin />}></Route>
           <Route exact path="/Sidebar" element={<Sidebar />}></Route>
           <Route exact path="/ShowUser" element={<ShowUser />}></Route>
