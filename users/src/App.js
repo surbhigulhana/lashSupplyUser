@@ -28,6 +28,7 @@ import Webcam from "./Component/Webcam";
 import Webcam1 from "./Component/Webcam";
 import DummpyPrdo from "./Component/AdminDashboard/DummpyPrdo";
 import ChangePassword from "./Component/Changepwd";
+import BannerImg from "./Component/AdminDashboard/BannerImg";
 
 
 function App() {
@@ -35,11 +36,6 @@ function App() {
     <div>
       <Router>
         <Routes>
-     <Route
-            excat
-            path="/setpassword/:email"
-            element={<ChangePassword />}
-          ></Route>
           <Route exact path="/" element={<AdminLogin />}></Route>
           <Route exact path="/Sidebar" element={<Sidebar />}></Route>
           <Route exact path="/ShowUser" element={<ShowUser />}></Route>
@@ -96,6 +92,12 @@ function App() {
             <Route exact path="/Orderp" element={<PendingOrder/>}></Route> 
             <Route exact path="/Orderc" element={<CompleteOrder/>}></Route>
             <Route exact path="/dummy" element={<DummpyPrdo/>}></Route>
+            <Route
+            excat
+            path="/setpassword/:email"
+            element={<ChangePassword />}
+          ></Route>
+            <Route exact path="/BannerImg" element={<BannerImg/>}></Route>
         </Routes>
       </Router>
     </div>
