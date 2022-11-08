@@ -513,7 +513,7 @@ const BannerImg = () => {
                                 Edit
                               </button>
                               <Modal
-                                size="xl"
+                                size="small"
                                 show={editShow}
                                 onHide={editHandleClose}
                               >
