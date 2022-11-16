@@ -513,8 +513,7 @@ const Product = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {data &&
-                      data
+                    {data && data
                         .filter((val) => {
                           if (search == "") {
                             return val;
@@ -1006,28 +1005,7 @@ const Product = () => {
                           </div>
                         </div>
 
-                        // <p
-                        //   class="h-1 mt-4"
-                        //   style={{ fontSize: "20px", color: "#121212" }}
-                        // >
-                        //   <ul>
-                        //     <img
-                        //       width="100"
-                        //       height="80"
-                        //       controls
-                        //       src={
-                        //         "http://3.114.92.202:4003/uploads/" + item.filename
-                        //       }
-                        //     />
-                        //     <i
-                        //       class="fa fa-circle"
-                        //       style={{ fontSize: "7px", color: "lightgray" }}
-                        //     ></i>
-                        //     &nbsp;
-                        //     {item.AttributeType}
-                        //   </ul>
-                        // </p>
-                      ))}
+                                              ))}
                     </div>
                     <div class="modal-footer">
                       <button
