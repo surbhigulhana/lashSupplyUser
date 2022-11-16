@@ -13,11 +13,18 @@ const AddCategory = () => {
 
   const [CateName, setname] = useState("");
   const [desc, setDesc] = useState("");
-
+  const [picture, setPicture] = useState({ fileName: "", bytes: "" });
+  const handlePicture = (event) => {
+    setPicture({
+      fileName: URL.createObjectURL(event.target.files[0]),
+      bytes: event.target.files[0],
+    });
+  };
   const handleSubmit = async () => {
     var formData = new FormData();
     formData.append("CateName", CateName);
     formData.append("desc", desc);
+    formData.append("filename", picture.bytes);
 
     try {
       const response = await fetch("http://3.114.92.202:4003/api/category", {
@@ -356,6 +363,7 @@ const AddCategory = () => {
                       <input
                         type="description"
                         class="form-control"
+                        placeholder="Category"
                         style={{ marginBottom: "16px;", height: "100px;" }}
                         onChange={(e) => {
                           setname(e.target.value);
@@ -370,6 +378,7 @@ const AddCategory = () => {
 
                     <div class="col-md-10">
                       <input
+                      placeholder="Description"
                         type="description"
                         class="form-control"
                         style={{ marginBottom: "16px;", height: "100px;" }}
@@ -378,6 +387,32 @@ const AddCategory = () => {
                         }}
                         value={desc}
                       />
+                    </div>
+                  </div><br/>
+                  <div class="row">
+                    <div class="col-md-2" >
+                      Upload Images{" "}
+                    </div>
+                    <div class="col-md-10">
+                      <div class="input-group mb-3">
+                        <div class="custom-file">
+                          <input
+                            accept="image/*"
+                            onChange={handlePicture}
+                            type="file"
+                            class="custom-file-input"
+                            name="image"
+                            id="inputGroupFile01"
+                            required
+                          />
+                          <label
+                            class="custom-file-label"
+                            for="inputGroupFile01"
+                          >
+                            Choose file
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div class="row">
