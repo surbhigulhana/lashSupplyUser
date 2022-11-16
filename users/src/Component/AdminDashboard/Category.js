@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import {Modal,Button} from 'react-bootstrap'
 import "../css/bootstrap.css";
 import "../css/style.css";
 import "../css/all.min.css";
@@ -34,7 +34,89 @@ const Category = () => {
       });
     });
   }
+// ------------------------------------------------------------------------------
+const handleShowView = () => setEditShowView(true);
+const [editShowView, setEditShowView] = useState(false);
+//-----------edit----------------------
+const handleShow = () => setEditShow(true);
+const [editShow, setEditShow] = useState(false);
+const handleClose = () => setEditShow(false);
+//-------------------------------------------------------
 
+const [id, setId] = useState("");
+// const [editShow, setEditShow] = useState(false);
+const editHandleClose = () => setEditShow(false);
+const editHandleShow = () => setEditShow(true);
+
+
+
+function editDataDisplay(uid, id) {
+  console.log("loop", id);
+  const filterData = data.filter((item) => {
+    return item._id === id;
+  });
+
+  setPicture(filterData[0].filename);
+ 
+  setId(filterData[0]._id);
+}
+
+async function editData() {
+  console.log("loop", id);
+  var formData = new FormData();
+ 
+  formData.append("filename", picture.bytes);
+ 
+
+  let result = await fetch(`http://3.114.92.202:4003/categoryImg/${id}`, {
+    method: "post",
+    mode: "cors",
+    body: formData,
+  
+  });
+  let data = await result.json();
+  console.log(data);
+
+ 
+  fetch("http://3.114.92.202:4003/category").then((result) => {
+    result.json().then((resp) => {
+      setData(resp);
+    });
+  });
+}
+
+
+  // const[data,setData]=useState([]);
+  const [picture, setPicture] = useState({ fileName: "", bytes: "" });
+  const handlePicture = (event) => {
+      setPicture({
+        fileName: URL.createObjectURL(event.target.files[0]),
+        bytes: event.target.files[0],
+      });
+    };
+
+    const handleSubmit = async () => {
+      var formData = new FormData();
+      formData.append("filename", picture.bytes);
+      try {
+        const response = await fetch("http://3.114.92.202:4003/categoryImg", {
+          method: "POST",
+          mode: "cors",
+          body: formData,
+        });
+        const result = await response.json();
+        console.log(result);
+        
+        fetch("http://3.114.92.202:4003/category").then((result) => {
+          result.json().then((resp) => {
+            setData(resp);
+          });
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+   
   return (
     <div>
       <body id="page-top">
@@ -211,7 +293,7 @@ const Category = () => {
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/BannerImg">
+              <a class="nav-link" href="/categoryImg">
                 <i class="fa fa-cog"></i>
                 <span>Banner</span>
               </a>
@@ -368,7 +450,7 @@ const Category = () => {
                     <tr>
                       <th class="bl5"> #</th>
                       <th class="bl5"> Category name</th>
-                      {/* <th class="bl5"> Description</th> */}
+                      <th class="bl5">Picture</th>
                       <th class="bl5">Action</th>
                     </tr>
                   </thead>
@@ -387,13 +469,111 @@ const Category = () => {
                         <tr key={item._id}>
                           <td data-label="User Id">{index + 1}</td>
                           <td data-label="firstName">{item.CateName}</td>
-                          {/* <td data-label="LastName" style={{textAlign:"justify"}}>{item.desc}</td> */}
-
-                          <td data-label="Action">
-                            <button type="button" class="btn btn-primary ab1"  onClick={() => deleteData(item._id)}   style={{"backgroundColor":"#DD3333",color:"white",border:"none"}}>
+                        <td><img
+                                  width="100"
+                                  height="80"
+                                  controls
+                                  src={
+                                    "http://3.114.92.202:4003/uploads/" +
+                                    item.filename
+                                  }
+                                />
+</td>
+<td data-label="Action">
+                             
+                              
+                             &nbsp; &nbsp;
+                             <button
+                               type="button"
+                               class="btn btn-primary ab1"
+                               onClick={() => {
+                                 editDataDisplay(item.uid, item._id);
+                                 editHandleShow();
+                               }}
+                               style={{
+                                 backgroundColor: "#DD3333",
+                                 color: "white",
+                                 border: "none",
+                               }}
+                             >
+                               Edit
+                             </button>&nbsp;&nbsp;
+                             <button type="button" class="btn btn-primary ab1"  onClick={() => deleteData(item._id)}   style={{"backgroundColor":"#DD3333",color:"white",border:"none"}}>
                               Delete
                             </button>
-                          </td>
+                             <Modal
+                               size="small"
+                               show={editShow}
+                               onHide={editHandleClose}
+                             >
+                               <Modal.Header closeButton>
+                                 <Modal.Title>Edit Data</Modal.Title>
+                               </Modal.Header>
+                               <Modal.Body>
+                                 <div class="container-fluid">
+                                   {/* <!-- Page Heading --> */}
+                                   <div class="d-sm-flex align-items-center justify-content-between mb-4"></div>
+                                   <form>
+                                    
+
+                                     <div class="row">
+                                       <div
+                                         class="col-md-2"
+                                         style={{ marginTop: "6px;" }}
+                                       >
+                                         Upload Images{" "}
+                                       </div>
+                                       <div class="col-md-10">
+                                         <div class="input-group mb-3">
+                                           <div class="custom-file">
+                                             <input
+                                               accept="image/*"
+                                               onChange={handlePicture}
+                                               type="file"
+                                               class="custom-file-input"
+                                               name="image"
+                                               id="inputGroupFile01"
+                                               required
+                                             />
+                                             <label
+                                               class="custom-file-label"
+                                               for="inputGroupFile01"
+                                             >
+                                               Choose file
+                                             </label>
+                                           </div>
+                                         </div>
+                                       </div>
+                                     </div>
+                      
+                                   </form>
+                                 </div>
+                               </Modal.Body>
+                               <Modal.Footer>
+                                 <Button
+                                   variant="secondary"
+                                   onClick={editHandleClose}
+                                 >
+                                   Close
+                                 </Button>
+                                 <Button
+                                   variant="primary"
+                                   onClick={() => {
+                                     editData(item._id);
+                                     editHandleClose();
+                                   }}
+                                   style={{
+                                     backgroundColor: "#DD3333",
+                                     color: "white",
+                                     border: "none",
+                                   }}
+                                 >
+                                   Save Changes
+                                 </Button>
+                               </Modal.Footer>
+                             </Modal>
+                           </td>
+                        
                         </tr>
                       ))}
                   </tbody>
