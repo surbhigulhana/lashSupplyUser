@@ -1,5 +1,6 @@
+// export default Webcam1
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/bootstrap.css";
 import "../css/style.css";
 import "../css/all.min.css";
@@ -12,17 +13,74 @@ import { Table, Modal, Button } from "react-bootstrap";
 import Swal from "sweetalert2";
 
 const Product = () => {
+  const [Type, setTypes] = useState([]);
+  const [Type2, setType2] = useState([]);
+  const [StoreName, setStoreName] = useState("");
+  const [AttributeName2, setAttributename2] = useState("");
+  const [AttributeName1, setAttributename1] = useState("");
+  // storedata
+  const [Storedata, setStoreData] = useState([]);
+  useEffect(() => {
+    fetch("http://3.114.92.202:4003/StoreName").then((result) => {
+      result.json().then((resp) => {
+        setStoreData(resp);
+      });
+    });
+  }, []);
+  const getpji = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setTypes([...Type, value]);
+    } else {
+      setTypes(Type.filter((e) => e !== value));
+    }
+  };
+  const getpji2 = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setType2([...Type2, value]);
+    } else {
+      setType2(Type2.filter((e) => e !== value));
+    }
+  };
+
+  const getpji3 = (e) => {
+    const { value, checked } = e.target;
+    console.log(`${value} is ${checked}`);
+    if (checked) {
+      setStoreName([...StoreName, value]);
+    } else {
+      setStoreName(StoreName.filter((e) => e !== value));
+    }
+  };
+  const [Attributedata2, setAttributeData2] = useState([]);
+  useEffect(() => {
+    fetch("http://3.114.92.202:4003/attribute").then((result) => {
+      result.json().then((resp) => {
+        setAttributeData2(resp);
+      });
+    });
+  }, []);
+
+  const [Type22, setType22] = useState([]);
+  async function filter2(id) {
+    let result = await fetch(`http://3.114.92.202:4003/display/${id}`);
+    let data = await result.json();
+    setType22(data);
+    // setAttributename(data)
+  }
+
   //--------------view----------------------
   const handleShowView = () => setEditShowView(true);
   const [editShowView, setEditShowView] = useState(false);
   //-----------edit----------------------
-  const handleShow = () => setEditShow(true);
-  const [editShow, setEditShow] = useState(false);
-  const handleClose = () => setEditShow(false);
+
   //-------------------------------------------------------
   const [pictureList, setPictureList] = useState([]);
   const handleClick = async (item) => {
-    const response = await fetch("http://3.114.92.202:4003/MoreData/" + item.Name);
+    const response = await fetch(
+      "http://3.114.92.202:4003/MoreData/" + item.Name
+    );
     const data1 = await response.json();
     setPictureList(data1);
   };
@@ -45,7 +103,7 @@ const Product = () => {
       method: "delete",
     });
     let data = await result.json();
-    console.log(data);
+
     fetch("http://3.114.92.202:4003/ProductData").then((result) => {
       result.json().then((resp) => {
         setData(resp);
@@ -88,92 +146,158 @@ const Product = () => {
     setType1(data);
   }
 
-  //-----------edit data
   const [id, setId] = useState("");
-  // const [editShow, setEditShow] = useState(false);
   const editHandleClose = () => setEditShow(false);
   const editHandleShow = () => setEditShow(true);
-
+  const [editShow, setEditShow] = useState(false);
+  const handleClose = () => setEditShow(false);
+  const handleShow = () => setEditShow(true);
+  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  const editHandleClose1 = () => setEditShow1(false);
+  const editHandleShow1 = () => setEditShow1(true);
+  const [editShow1, setEditShow1] = useState(false);
+  const handleClose1 = () => setEditShow1(false);
+  const handleShow1 = () => setEditShow1(true);
   const [Name, setname] = useState("");
   const [Desc, setdesc] = useState("");
-  const [AttributeName, setAttributename] = useState("");
-  const [AttributeType, setType] = useState("red");
+
   const [CateName, setCatename] = useState("");
   const [MinPrice, setMinPrice] = useState("");
   const [MaxPrice, setMaxPrice] = useState("");
   const [Price, setPrice] = useState("");
-  const [picture, setPicture] = useState({ fileName: "", bytes: "" });
+  // const [picture, setPicture] = useState({ fileName: "", bytes: "" });
+  // console.log(picture)
   const [SkuNo, setSku] = useState("");
-  const [Inventory, setInventory] = useState("");
   const [AllProductdata, setAllProduct] = useState([]);
   function editDataDisplay(uid, id) {
-    console.log("loop", id);
     const filterData = data.filter((item) => {
       return item._id === id;
     });
+
     setname(filterData[0].Name);
-    setAttributename(filterData[0].AttributeName);
-    setType(filterData[0].AttributeType);
+    // setAttributename1(filterData[0].AttributeName1);
+    //  setAttributename2(filterData[0].AttributeName2)
+    // setTypes(filterData[0].AttributeType1);
+    //  setType2(filterData[0].AttributeType2)
     setSku(filterData[0].SkuNo);
     setMinPrice(filterData[0].MinPrice);
     setCatename(filterData[0].CateName);
     setMaxPrice(filterData[0].MaxPrice);
+    // setStoreName(filterData.StoreName)
     setdesc(filterData[0].Desc);
     setPrice(filterData[0].Price);
-    setPicture(filterData[0].filename);
-    setInventory(filterData[0].Inventory);
     setId(filterData[0]._id);
   }
-  const handlePicture = (event) => {
-    setPicture({
-      fileName: URL.createObjectURL(event.target.files[0]),
-      bytes: event.target.files[0],
-    });
-  };
+  const history = useNavigate();
   async function editData() {
-    console.log("loop", id);
-    var formData = new FormData();
-    formData.append("CateName", CateName);
-    formData.append("filename", picture.bytes);
-    formData.append("Name", Name);
-    formData.append("Desc", Desc);
-    formData.append("AttributeName", AttributeName);
-    formData.append("AttributeType", AttributeType);
-    formData.append("MinPrice", MinPrice);
-    formData.append("MaxPrice", MaxPrice);
-    formData.append("Price", Price);
-    formData.append("Inventory", Inventory);
-    formData.append("SkuNo", SkuNo);
+    let databody = {
+      CateName: CateName,
+      Name: Name,
+      Desc: Desc,
+      AttributeName1: AttributeName1,
+      AttributeName2: AttributeName2,
+      AttributeType1: Type,
+      AttributeType2: Type2,
+      MinPrice: MinPrice,
+      MaxPrice: MaxPrice,
+      Price: Price,
+      StoreName: StoreName,
+      SkuNo: SkuNo,
+    };
 
     let result = await fetch(`http://3.114.92.202:4003/productData/${id}`, {
-      method: "post",
-      mode: "cors",
-      // headers: {
-      //   "Content-Type": "application/json",
-      // },
-      body: formData,
-      // body: JSON.stringify(databody),
+      method: "put",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(databody),
     });
     let data = await result.json();
-    console.log(data);
-
+    if (result.success) {
+      Swal.fire({
+        icon: "success",
+        // title: 'Password Changed',
+        text: " successfully updated",
+      }).then(function () {
+        history("/Product");
+      });
+    } 
+    else {
+      Swal.fire({
+        icon: "success",
+        // title: 'Password Changed',
+        text:"successfully updated",
+      });
+    }
     setname("");
     setdesc("");
-    setAttributename("");
     setCatename("");
-    setType("");
     setMinPrice("");
     setMaxPrice("");
-    setInventory("");
     setSku("");
     setPrice("");
+
     fetch("http://3.114.92.202:4003/productData").then((result) => {
       result.json().then((resp) => {
-        setAllProduct(resp);
+        setData(resp);
       });
     });
   }
 
+  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+// images update function
+const [picture, setPicture] = useState({ fileName: "", bytes: "" });
+
+function editDataDisplay1(uid, id) {
+
+  const filterData = data.filter((item) => {
+    return item._id === id;
+  });
+
+  setPicture(filterData[0].imgCollection);
+
+  setId(filterData[0]._id);
+}
+
+async function editData1() {
+
+  var formData = new FormData();
+
+  Object.keys(picture).forEach((imgCollection) => {
+    formData.append("imgCollection", picture[imgCollection]);
+  });
+
+  let result = await fetch(`http://localhost:4003/Img/${id}`, {
+    method: "post",
+    mode: "cors",
+    body: formData,
+  });
+  let data = await result.json();
+  if (result.success) {
+    Swal.fire({
+      icon: "success",
+      // title: 'Password Changed',
+      text: " successfully updated",
+    }).then(function () {
+      history("/Product");
+    });
+  } 
+  else {
+    Swal.fire({
+      icon: "success",
+      // title: 'Password Changed',
+      text:"successfully updated",
+    });
+  }
+  console.log(data);
+  fetch("http://3.114.92.202:4003/productData").then((result) => {
+    result.json().then((resp) => {
+      setData(resp);
+    });
+  });
+  
+}
+// xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   return (
     <div>
       <body id="page-top">
@@ -352,8 +476,12 @@ const Product = () => {
                 <span>Ticket</span>
               </a>
             </li>
-           
-       
+            <li class="nav-item">
+              <a class="nav-link" href="/StoreName">
+                <i class="fa fa-cog"></i>
+                <span>StoreName</span>
+              </a>
+            </li>
           </ul>
           {/* <!-- End of Sidebar --> */}
 
@@ -433,23 +561,15 @@ const Product = () => {
                     </li>
 
                     <li class="nav-item dropdown no-arrow">
-                   <button type="button" class="btn btn-primary an1">
-                         ADMIN
-                       </button>
-                     <a
-                      
-                       href="/"
-                       id="userDropdown"
-                      
-                     >
-                       
-                      
-                       <button type="button" class="btn btn-primary an1">
-                         Logout
-                       </button>
-                     </a>
-
-                   </li>
+                      <button type="button" class="btn btn-primary an1">
+                        ADMIN
+                      </button>
+                      <a href="/" id="userDropdown">
+                        <button type="button" class="btn btn-primary an1">
+                          Logout
+                        </button>
+                      </a>
+                    </li>
                   </ul>
                 </nav>
               </header>
@@ -484,14 +604,15 @@ const Product = () => {
                     <tr>
                       <th class="bl5">#</th>
                       <th class="bl5">SKU number</th>
-                      <th class="bl5"> Product name</th>
+                      <th class="bl5">Product name</th>
                       <th class="bl5">Category</th>
                       <th class="bl5">View Details</th>
                       <th class="bl5">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {data && data
+                    {data &&
+                      data
                         .filter((val) => {
                           if (search == "") {
                             return val;
@@ -529,6 +650,93 @@ const Product = () => {
                               >
                                 View
                               </button>
+                              &nbsp;
+                              <button
+                                type="button"
+                                class="btn btn-primary ab1"
+                                onClick={() => {
+                                  editDataDisplay1(item.uid, item._id);
+                                  editHandleShow1();
+                                }}
+                                style={{
+                                  backgroundColor: "#DD3333",
+                                  color: "white",
+                                  border: "none",
+                                }}
+                              >
+                                Update
+                              </button>
+                              <Modal
+                                size="small"
+                                show={editShow1}
+                                onHide={editHandleClose1}
+                              >
+                                <Modal.Header closeButton>
+                                  <Modal.Title>Edit Data</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                  <div class="container-fluid">
+                                    {/* <!-- Page Heading --> */}
+                                    <div class="d-sm-flex align-items-center justify-content-between mb-4"></div>
+                                    <form>
+                                      <div class="row">
+                                        <div
+                                          class="col-md-2"
+                                          style={{ marginTop: "6px;" }}
+                                        >
+                                          Upload Images{" "}
+                                        </div>
+                                        <div class="col-md-10">
+                                          <div class="input-group mb-3">
+                                            <div class="custom-file">
+                                              <input
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                  setPicture(e.target.files);
+                                                }}
+                                                type="file"
+                                                class="custom-file-input"
+                                                name="image"
+                                                id="inputGroupFile01"
+                                                required
+                                                multiple
+                                              />
+                                              <label
+                                                class="custom-file-label"
+                                                for="inputGroupFile01"
+                                              >
+                                                Choose file
+                                              </label>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </form>
+                                  </div>
+                                </Modal.Body>
+                                <Modal.Footer>
+                                  <Button
+                                    variant="secondary"
+                                    onClick={editHandleClose1}
+                                  >
+                                    Close
+                                  </Button>
+                                  <Button
+                                    variant="primary"
+                                    onClick={() => {
+                                      editData1(item._id);
+                                      editHandleClose1();
+                                    }}
+                                    style={{
+                                      backgroundColor: "#DD3333",
+                                      color: "white",
+                                      border: "none",
+                                    }}
+                                  >
+                                    Save Changes
+                                  </Button>
+                                </Modal.Footer>
+                              </Modal>
                             </td>
 
                             <td data-label="Action">
@@ -560,6 +768,38 @@ const Product = () => {
                                     {/* <!-- Page Heading --> */}
                                     <div class="d-sm-flex align-items-center justify-content-between mb-4"></div>
                                     <form>
+                                      {/* {pictureList.map((item, index) => (
+                                        <div class="container">
+                                          <div
+                                            class="row"
+                                            style={{ width: "250%" }}
+                                          >
+                                            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                                              <div
+                                                class="card"
+                                                style={{ border: "none" }}
+                                              >
+                                                <div style={{ width: "130%" }}>
+                                                  {item &&
+                                                    item.imgCollection.map(
+                                                      (file, index) => (
+                                                        <img
+                                                          src={file}
+                                                          style={{
+                                                            height: "94px",
+                                                            width: "94px",
+                                                            float: "left",
+                                                            margin: "5px",
+                                                          }}
+                                                        ></img>
+                                                      )
+                                                    )}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))} */}
                                       <div class="row">
                                         <div
                                           class="col-md-2"
@@ -701,35 +941,67 @@ const Product = () => {
                                           class="col-md-2"
                                           style={{ marginTop: "7px;" }}
                                         >
-                                          Select Attributes{" "}
+                                          Select Attributes 1{" "}
                                         </div>
                                         <div class="col-md-10">
                                           <div class="input-group mb-3">
-                                            <select
-                                              class="custom-select"
-                                              id="inputGroupSelect01"
-                                              value={AttributeName}
-                                              onChange={(e) => {
-                                                filter(e.target.value);
-                                                setAttributename(
-                                                  e.target.value
-                                                );
-                                              }}
-                                            >
-                                              <option selected>
-                                                Select Attribute{" "}
-                                              </option>
-                                              {Attributedata.map(
-                                                (item, index) => (
-                                                  <option
-                                                    key={index}
-                                                    value={item.AttributeName}
-                                                  >
-                                                    {item.AttributeName}
+                                            <div class="multiselect">
+                                              <div
+                                                class="selectBox"
+                                                onclick="showCheckboxes()"
+                                              >
+                                                <select
+                                                  onChange={(e) => {
+                                                    filter(e.target.value);
+                                                    setAttributename1(
+                                                      e.target.value
+                                                    );
+                                                  }}
+                                                  class="form-control"
+                                                  style={{ width: "580%" }}
+                                                >
+                                                  <option>
+                                                    Select Attribute 1
                                                   </option>
-                                                )
-                                              )}
-                                            </select>
+                                                  {Attributedata.map(
+                                                    (item, index) => (
+                                                      <option
+                                                        key={index}
+                                                        value={
+                                                          item.AttributeName
+                                                        }
+                                                      >
+                                                        {item.AttributeName}
+                                                        &nbsp;
+                                                      </option>
+                                                    )
+                                                  )}
+                                                </select>
+                                                <div class="overSelect"></div>
+                                              </div>
+                                              <br />
+                                              <div
+                                                id="checkboxes"
+                                                value={Type}
+                                                onChange={(e) => {
+                                                  getpji(e);
+                                                }}
+                                              >
+                                                {Type1.map((item) => (
+                                                  <label for="one">
+                                                    <input
+                                                      type="checkbox"
+                                                      id="one"
+                                                      value={item.AttributeType}
+                                                    />
+                                                    &nbsp;
+                                                    {item.AttributeType}
+                                                    &nbsp;&nbsp;&nbsp;
+                                                  </label>
+                                                ))}
+                                              </div>
+                                              <br />
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
@@ -738,29 +1010,68 @@ const Product = () => {
                                           class="col-md-2"
                                           style={{ marginTop: "7px;" }}
                                         >
-                                          Select Attributes Type{" "}
+                                          Select Attributes 2{" "}
                                         </div>
                                         <div class="col-md-10">
                                           <div class="input-group mb-3">
-                                            <select
-                                              class="custom-select"
-                                              id="inputGroupSelect01"
-                                              value={AttributeType}
-                                              onChange={(e) => {
-                                                setType(e.target.value);
-                                              }}
-                                            >
-                                              <option selected>
-                                                Select Type{" "}
-                                              </option>
-                                              {Type1.map((item) => (
-                                                <option
-                                                  value={item.AttributeType}
+                                            <div class="multiselect">
+                                              <div
+                                                class="selectBox"
+                                                onclick="showCheckboxes()"
+                                              >
+                                                <select
+                                                  onChange={(e) => {
+                                                    filter2(e.target.value);
+                                                    setAttributename2(
+                                                      e.target.value
+                                                    );
+                                                  }}
+                                                  class="form-control"
+                                                  style={{ width: "580%" }}
                                                 >
-                                                  {item.AttributeType}
-                                                </option>
-                                              ))}
-                                            </select>
+                                                  <option>
+                                                    Select Attribute 2
+                                                  </option>
+
+                                                  {Attributedata2.map(
+                                                    (item, index) => (
+                                                      <option
+                                                        key={index}
+                                                        value={
+                                                          item.AttributeName
+                                                        }
+                                                      >
+                                                        {item.AttributeName}
+                                                      </option>
+                                                    )
+                                                  )}
+                                                </select>
+                                                <div class="overSelect"></div>
+                                              </div>
+                                              <br />
+                                              <div
+                                                id="checkboxes"
+                                                value={Type2}
+                                                onChange={(e) => {
+                                                  getpji2(e);
+                                                }}
+                                              >
+                                                {Type22.map((item) => (
+                                                  <label for="one">
+                                                    &nbsp;
+                                                    <input
+                                                      type="checkbox"
+                                                      id="one"
+                                                      value={item.AttributeType}
+                                                    />
+                                                    &nbsp;
+                                                    {item.AttributeType}
+                                                    &nbsp;&nbsp;&nbsp;
+                                                  </label>
+                                                ))}
+                                              </div>
+                                              <br />
+                                            </div>
                                           </div>
                                         </div>
                                       </div>
@@ -788,57 +1099,42 @@ const Product = () => {
                                           <br />
                                         </div>
                                       </div>
-
                                       <div class="row">
                                         <div
                                           class="col-md-2"
-                                          style={{ marginTop: "6px;" }}
+                                          style={{ marginTop: "7px;" }}
                                         >
-                                          Upload Images{" "}
+                                          Select StoreName{" "}
                                         </div>
                                         <div class="col-md-10">
                                           <div class="input-group mb-3">
-                                            <div class="custom-file">
-                                              <input
-                                                accept="image/*"
-                                                onChange={handlePicture}
-                                                type="file"
-                                                class="custom-file-input"
-                                                name="image"
-                                                id="inputGroupFile01"
-                                                required
-                                              />
-                                              <label
-                                                class="custom-file-label"
-                                                for="inputGroupFile01"
+                                            <div class="multiselect">
+                                              <div
+                                                id="checkboxes"
+                                                value={StoreName}
+                                                onChange={(e) => {
+                                                  getpji3(e);
+                                                }}
                                               >
-                                                Choose file
-                                              </label>
+                                                {Storedata.map((item) => (
+                                                  <label for="one">
+                                                    <input
+                                                      type="checkbox"
+                                                      id="one"
+                                                      value={item.Name}
+                                                    />
+                                                    &nbsp;
+                                                    {item.Name}
+                                                    &nbsp;&nbsp;&nbsp;
+                                                  </label>
+                                                ))}
+                                              </div>
+                                              <br />
                                             </div>
                                           </div>
                                         </div>
                                       </div>
-                                      {/* <div class="row">
-                    <div class="col-md-2" style={{ marginTop: "6px;" }}>
-                      Product Inventory
-                    </div>
-
-                    <div class="col-md-10">
-                      <input
-                        type="text"
-                        class="form-control"
-                        name="price"
-                        placeholder="Inventory"
-                        style={{ marginBottom: "16px;" }}
-                        required
-                        value={Inventory}
-                          onChange={(e) => {
-                            setInventory(e.target.value)
-                          }}
-                      />
-                      <br />
-                    </div>
-                  </div> */}
+                                        
                                     </form>
                                   </div>
                                 </Modal.Body>
@@ -853,6 +1149,7 @@ const Product = () => {
                                     variant="primary"
                                     onClick={() => {
                                       editData(item._id);
+                                      // handleSubmit();
                                       editHandleClose();
                                     }}
                                     style={{
@@ -894,7 +1191,7 @@ const Product = () => {
                 aria-hidden="true"
               >
                 <div class="modal-dialog" role="document">
-                  <div class="modal-content">
+                  <div class="modal-content" style={{ width: "150%" }}>
                     <div class="modal-header">
                       <h5 class="modal-title" id="exampleModalLabel">
                         More Details
@@ -914,36 +1211,40 @@ const Product = () => {
                           <div class="row" style={{ width: "250%" }}>
                             <div class="col-12 col-sm-8 col-md-6 col-lg-4">
                               <div class="card" style={{ border: "none" }}>
-                                <img
-                                  width="100"
-                                  height="80"
-                                  controls
-                                  src={
-                                    "http://3.114.92.202:4003/uploads/" +
-                                    item.filename
-                                  }
-                                />
+                                <div style={{ width: "130%" }}>
+                                  {item &&
+                                    item.imgCollection.map((file, index) => (
+                                      <img
+                                        src={file}
+                                        style={{
+                                          height: "94px",
+                                          width: "94px",
+                                          float: "left",
+                                          margin: "5px",
+                                        }}
+                                      ></img>
+                                    ))}
+                                </div>
 
                                 <div class="card-body">
                                   <p
                                     class="card-title"
                                     style={{ textAlign: "justify" }}
                                   >
-                                    {item.Desc}
+                                    Description: {item.Desc}
                                   </p>
                                   <h6 class="card-subtitle mb-2 text-muted">
                                     {item.AttributeName1} :
                                     {pictureList[0] ? (
-                                      pictureList[0].AttributeType1.map((item, index) => {
-                                        return (
-                                          <p
-                                            class="h-1 mt-4"
-                                           
-                                          >
-                                            <li key={index}>{item}</li>
-                                          </p>
-                                        );
-                                      })
+                                      pictureList[0].AttributeType1.map(
+                                        (item, index) => {
+                                          return (
+                                            <p class="h-1 mt-4">
+                                              <li key={index}>{item}</li>
+                                            </p>
+                                          );
+                                        }
+                                      )
                                     ) : (
                                       <div></div>
                                     )}
@@ -953,16 +1254,15 @@ const Product = () => {
                                   <h6 class="card-subtitle mb-2 text-muted">
                                     {item.AttributeName2} :{" "}
                                     {pictureList[0] ? (
-                                      pictureList[0].AttributeType2.map((item, index) => {
-                                        return (
-                                          <p
-                                            class="h-1 mt-4"
-                                           
-                                          >
-                                            <li key={index}>{item}</li>
-                                          </p>
-                                        );
-                                      })
+                                      pictureList[0].AttributeType2.map(
+                                        (item, index) => {
+                                          return (
+                                            <p class="h-1 mt-4">
+                                              <li key={index}>{item}</li>
+                                            </p>
+                                          );
+                                        }
+                                      )
                                     ) : (
                                       <div></div>
                                     )}
@@ -971,29 +1271,33 @@ const Product = () => {
                                     Min.Price: ${item.MinPrice} &nbsp; &nbsp;
                                     Max.Price: ${item.MaxPrice}
                                   </p>
-                                  <a href="#" class="card-link">
-                                    ${item.Price}
-                                  </a>
-                                  <a href="#" class="card-link">
-                                    {item.Inventory}
-                                  </a>
+
+                                  <p class="card-text">Price: ${item.Price}</p>
+
+                                  <h6 class="card-subtitle mb-2 text-muted">
+                                    Available Store
+                                    {pictureList[0] ? (
+                                      pictureList[0].StoreName.map(
+                                        (item, index) => {
+                                          return (
+                                            <p class="h-1 mt-4">
+                                              <li key={index}>{item}</li>
+                                            </p>
+                                          );
+                                        }
+                                      )
+                                    ) : (
+                                      <div></div>
+                                    )}
+                                  </h6>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
-
-                                              ))}
+                      ))}
                     </div>
-                    <div class="modal-footer">
-                      <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-dismiss="modal"
-                      >
-                        Close
-                      </button>
-                    </div>
+                  
                   </div>
                 </div>
               </div>
@@ -1002,7 +1306,7 @@ const Product = () => {
             {/* <!-- End of Main Content --> */}
 
             {/* <!-- Footer --> */}
-            
+
             {/* <!-- End of Footer --> */}
           </div>
           {/* <!-- End of Content Wrapper --> */}
