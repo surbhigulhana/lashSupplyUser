@@ -29,6 +29,10 @@ import Webcam1 from "./Component/Webcam";
 import DummpyPrdo from "./Component/AdminDashboard/DummpyPrdo";
 import ChangePassword from "./Component/Changepwd";
 import BannerImg from "./Component/AdminDashboard/BannerImg";
+import MultiImg from "./Component/AdminDashboard/multiimg";
+import StoreName from "./Component/AdminDashboard/StoreName";
+import AddStorename from "./Component/AdminDashboard/AddStorename";
+import Img from "./Component/AdminDashboard/Img";
 
 
 function App() {
@@ -70,16 +74,16 @@ function App() {
             path="/AddProductName"
             element={<AddProductName />}
           ></Route>
-          {/* <Route
+          <Route
             exact
-            path="/Discount"
-            element={<DiscountCoupon />}
+            path="/StoreName"
+            element={<StoreName />}
           ></Route>{" "}
           <Route
             exact
-            path="/AddDiscount"
-            element={<AddDiscountCoupon/>}
-          ></Route>{" "} */}
+            path="/AddStoreName"
+            element={<AddStorename/>}
+          ></Route>{" "}
           <Route
             exact
             path="/Inquiry"
@@ -98,6 +102,8 @@ function App() {
             element={<ChangePassword />}
           ></Route>
             <Route exact path="/BannerImg" element={<BannerImg/>}></Route>
+            <Route exact path="/Multi" element={<MultiImg />}></Route>
+            <Route exact path="/Img" element={<Img />}></Route>
         </Routes>
       </Router>
     </div>
